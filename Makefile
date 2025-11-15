@@ -35,7 +35,7 @@ run:
 .PHONY: bench
 bench:
 	@echo "Benchmarking $(EXPERIMENT) with GOMAXPROCS=$(GOMAXPROCS)..."
-	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=. $(EXP_PKG)
+	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=. -benchmem $(EXP_PKG)
 
 
 .PHONY: profile-cpu

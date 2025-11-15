@@ -1,5 +1,9 @@
 package workload
 
+import (
+    "math/rand"
+)
+
 var rng = rand.New(rand.NewSource(1009)) // seed
 
 // RandomBytes returns n deterministic pseudo-random bytes.
