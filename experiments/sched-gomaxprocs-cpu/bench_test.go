@@ -25,7 +25,7 @@ func BenchmarkCpuBurnParallel(b *testing.B) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			workload.FakeCPU(1_000_000)
+			workload.FakeCPU(10_000_000)
 		}
 	})
 }

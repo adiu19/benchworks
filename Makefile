@@ -59,6 +59,14 @@ trace:
 	@echo "Trace written to trace.out"
 	@echo "Inspect with: go tool trace trace.out"
 
+
+.PHONY: trace-gmp-syscall
+trace-gmp-syscall:
+	@echo "Tracing sched-gmp-syscall-flood with GOMAXPROCS=$(GOMAXPROCS)..."
+	GOMAXPROCS=$(GOMAXPROCS) CGO_ENABLED=1 go run ./experiments/sched-gmp-syscall-flood
+	@echo "Trace written to trace-sched-gmp-syscall-flood.out"
+	@echo "Open with: go tool trace trace-sched-gmp-syscall-flood.out"
+
 # ---------- Misc ----------
 
 
