@@ -25,7 +25,7 @@ GOGC=off GOMAXPROCS=1 make trace EXPERIMENT=mem-alloc-hotloop-naive
 ### Interpretation
 With GC disabled, Go will never reclaim memory, the process grows until OOM or termination. 
 
-## 2. GOGC=10 — aggressive GC
+## 2. GOGC=10 - aggressive GC
 
 ```
 GOGC=10 GOMAXPROCS=1 make trace EXPERIMENT=mem-alloc-hotloop-naive
@@ -42,7 +42,7 @@ GOGC=10 GOMAXPROCS=1 make trace EXPERIMENT=mem-alloc-hotloop-naive
 ### Interpretation
 At low GOGC values, Go keeps heap size minimal but spends significant CPU time on GC. 
 
-## 3. Default (GOGC=100) — standard Go behavior
+## 3. Default (GOGC=100) - standard Go behavior
 
 ```
 GOMAXPROCS=1 make trace EXPERIMENT=mem-alloc-hotloop-naive
