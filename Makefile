@@ -1,5 +1,6 @@
 
 EXPERIMENT ?= sched-gomaxprocs-cpu
+BENCH ?= .
 EXP_PKG := ./experiments/$(EXPERIMENT)
 
 GOMAXPROCS ?= 0
@@ -8,14 +9,19 @@ GOMAXPROCS ?= 0
 .PHONY: help
 help:
 	@echo "Usage:"
-	@echo "  make run           EXPERIMENT=<name> [GOMAXPROCS=N]"
-	@echo "  make bench         EXPERIMENT=<name> [GOMAXPROCS=N]"
-	@echo "  make profile-cpu   EXPERIMENT=<name> [GOMAXPROCS=N]"
-	@echo "  make profile-mem   EXPERIMENT=<name> [GOMAXPROCS=N]"
-	@echo "  make trace         EXPERIMENT=<name> [GOMAXPROCS=N]"
+	@echo "  make run             EXPERIMENT=<name> [GOMAXPROCS=N]"
+	@echo "  make bench           EXPERIMENT=<name> [GOMAXPROCS=N] [BENCH=<regex>]"
+	@echo "  make profile-cpu     EXPERIMENT=<name> [GOMAXPROCS=N] [BENCH=<regex>]"
+	@echo "  make profile-mem     EXPERIMENT=<name> [GOMAXPROCS=N] [BENCH=<regex>]"
+	@echo "  make trace           EXPERIMENT=<name> [GOMAXPROCS=N] [BENCH=<regex>]"
 	@echo "  make list-experiments"
 	@echo ""
+	@echo "Notes:"
+	@echo "  - BENCH is an optional regex selecting which benchmarks to run."
+	@echo "    Defaults to '.' (run all benchmarks)."
+	@echo ""
 	@echo "Current EXPERIMENT: $(EXPERIMENT)"
+	@echo "Current BENCH: $(BENCH)"
 
 .PHONY: list-experiments
 list-experiments:
@@ -26,7 +32,13 @@ list-experiments:
 	@find experiments -maxdepth 1 -mindepth 1 -type d -exec basename {} \;
 
 
-
+.PHONY: list-benches
+list-benches:
+	@echo "---------------------------------------------------------------------------------------------"
+	@echo "------------------------------ Benchmarks in $(EXP_PKG) -------------------------------------"
+	@echo "---------------------------------------------------------------------------------------------"
+	@go test -run=^$$ -list=Benchmark $(EXP_PKG) | grep ^Benchmark || echo "No benchmarks found."
+	
 .PHONY: run
 run:
 	@echo "Running $(EXPERIMENT) with GOMAXPROCS=$(GOMAXPROCS)..."
@@ -35,27 +47,27 @@ run:
 .PHONY: bench
 bench:
 	@echo "Benchmarking $(EXPERIMENT) with GOMAXPROCS=$(GOMAXPROCS)..."
-	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=. -benchmem $(EXP_PKG)
+	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=$(BENCH) -benchmem $(EXP_PKG)
 
 
 .PHONY: profile-cpu
 profile-cpu:
 	@echo "CPU profiling $(EXPERIMENT) (cpu.pprof), GOMAXPROCS=$(GOMAXPROCS)..."
-	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=. -cpuprofile=cpu.pprof $(EXP_PKG)
+	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=$(BENCH) -cpuprofile=cpu.pprof $(EXP_PKG)
 	@echo "CPU profile written to cpu.pprof"
 	@echo "Inspect with: go tool pprof cpu.pprof"
 
 .PHONY: profile-mem
 profile-mem:
 	@echo "Heap profiling $(EXPERIMENT) (mem.pprof), GOMAXPROCS=$(GOMAXPROCS)..."
-	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=. -memprofile=mem.pprof $(EXP_PKG)
+	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=$(BENCH) -memprofile=mem.pprof $(EXP_PKG)
 	@echo "Heap profile written to mem.pprof"
 	@echo "Inspect with: go tool pprof mem.pprof"
 
 .PHONY: trace
 trace:
 	@echo "Tracing $(EXPERIMENT) (trace.out), GOMAXPROCS=$(GOMAXPROCS)..."
-	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=. -trace=trace.out $(EXP_PKG)
+	GOMAXPROCS=$(GOMAXPROCS) go test -run=^$$ -bench=$(BENCH) -trace=trace.out $(EXP_PKG)
 	@echo "Trace written to trace.out"
 	@echo "Inspect with: go tool trace trace.out"
 
